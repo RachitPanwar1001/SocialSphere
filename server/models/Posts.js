@@ -1,27 +1,26 @@
-module.exports = (sequelize, DataTypes) => {
-  const Posts = sequelize.define("Posts", {
-    title: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    postText: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  });
+module.exports = (sequelize , DataTypes) =>{
 
-  Posts.associate = (models) => {
-    Posts.hasMany(models.Comments, {
-      onDelete: "cascade",
+    const Posts = sequelize.define("Posts" , {
+        title : {
+            type : DataTypes.STRING,
+            allowNull : false,
+        },
+        postText : {
+            type : DataTypes.STRING,
+            allowNull : false,
+        },
+        userName : {
+            type : DataTypes.STRING,
+            allowNull : false,
+        },
+
     });
 
-    Posts.hasMany(models.Likes, {
-      onDelete: "cascade",
-    });
-  };
-  return Posts;
-};
+    Posts.associate = (models)=>{
+        Posts.hasMany(models.Comments , {
+            onDelete: "cascade",
+        });
+    }
+
+    return Posts;
+}   

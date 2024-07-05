@@ -1,11 +1,19 @@
 const express = require("express");
 const router = express.Router();
-const {Posts} = require("../models");
+const {Posts , Likes} = require("../models");
+const {validateToken} = require("../middlewares/AuthMiddleware")
 
 
-router.get("/" , async(req , res)=>{
-    const listOfPosts = await Posts.findAll();
-    res.json(listOfPosts);
+router.get("/" , validateToken,async(req , res)=>{
+    const listOfPosts = await Posts.findAll({
+        include: [Likes]
+    });
+    const likedPosts = await Likes.findAll({
+        where : {
+            UserId : req.user.id
+        }
+    })
+    res.json({listOfPosts : listOfPosts , likedPosts : likedPosts});
 });
 
 
@@ -16,10 +24,20 @@ router.get('/byId/:id' , async(req , res)=>{
     res.json(post);
 })
 
-router.post("/" , async (req , res)=>{
+router.post("/" , validateToken , async (req , res)=>{
+
     const post = req.body
+    post.userName = req.user.userName;
     await Posts.create(post);
     res.json(post);
 })
 
+router.delete("/:postId" , validateToken , async(req , res)=>{
+    const postId = req.params.postId;
+    await Posts.destroy({where : {
+        id : postId,
+    }
+    })
+    res.json("delted successfulllyyy");
+})
 module.exports=router;

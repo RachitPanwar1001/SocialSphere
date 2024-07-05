@@ -1,7 +1,8 @@
-import React, { useContext, useEffect  , useState} from 'react'
+import React, { useContext, useEffect  , useState } from 'react'
 import {useParams} from "react-router-dom";
 import axios from 'axios';
 import { AuthContext } from '../helpers/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 function Post() {
     let {id} = useParams();
@@ -9,7 +10,7 @@ function Post() {
     const [comments , setComments] = useState([])
     const [newComment , setNewComment] = useState("");
     const { authState} = useContext(AuthContext);
-
+    const navigate = useNavigate();
 
     useEffect(()=>{
         axios.get(`http://localhost:3001/posts/byId/${id}`).then((response)=>{
@@ -35,23 +36,35 @@ function Post() {
                 alert(response.data.error);
             }
             else{
-                const commentToAdd = {commentBody : newComment , userName : response.data.userName}
-            
-                setComments([...comments , commentToAdd] );
+                axios.get(`http://localhost:3001/comments/${id}`).then((response)=>{
+                    setComments(response.data);
+                });
+                
                 setNewComment("");
             }
         });
 
     }
 
-    const deleteComment = (id) => {
-        axios.delete(`http://localhost:3001/comments/${id}` ,{headers :  {
+    const deleteComment = (idd) => {
+        axios.delete(`http://localhost:3001/comments/${idd}` ,{headers :  {
             accessToken : localStorage.getItem("accessToken")
         }
     } ).then(()=>{
             setComments(comments.filter((val)=>{
-                return val.id != id
+                return val.id !== idd
             }))
+        });
+    }
+
+    const deletePost = (idd) =>{
+        
+        axios.delete(`http://localhost:3001/posts/${idd}` ,{headers :  {
+            accessToken : localStorage.getItem("accessToken")
+        }
+    } ).then(()=>{
+           alert("Post deleted");
+           navigate("/");
         });
     }
     return (
@@ -60,7 +73,9 @@ function Post() {
                 <div className='post' id='individual'>
                     <div className="title">{postObject.title}</div>
                     <div className="body">{postObject.postText}</div>
-                    <div className="footer">{postObject.userName}</div>
+                    <div className="footer">{postObject.userName}
+                        {authState.userName===postObject.userName &&(<button onClick={()=>{deletePost(postObject.id)}}>Delete Post</button>)}
+                    </div>
                 </div>
             </div>
             <div className='rightSide'>

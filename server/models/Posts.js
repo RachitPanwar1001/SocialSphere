@@ -16,11 +16,16 @@ module.exports = (sequelize , DataTypes) =>{
 
     });
 
+   
+
     Posts.associate = (models)=>{
+        Posts.hasMany(models.Likes , {
+            onDelete: "cascade",
+        });
         Posts.hasMany(models.Comments , {
             onDelete: "cascade",
         });
-    }
+    };
 
     return Posts;
 }   

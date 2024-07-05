@@ -32,7 +32,7 @@ function App() {
       });
       }
     })
-  });
+  } , []);
 
   const logout = () =>{
     localStorage.removeItem("accessToken");
@@ -48,13 +48,17 @@ function App() {
       <AuthContext.Provider value = {{authState , setAuthState}}>
       <Router>
         <div className="navbar">
-          <Link to = "/createpost">Create a Post</Link>
-          <Link to = "/">Home Page</Link>
           {
-            !authState.status && (
+            !authState.status ? (
               <>
                 <Link to = "/login">Login</Link>
                 <Link to = "/register">Register</Link>
+              </>
+            ) : 
+            (
+              <>
+              <Link to = "/createpost">Create a Post</Link>
+              <Link to = "/">Home Page</Link>
               </>
             )
           }
